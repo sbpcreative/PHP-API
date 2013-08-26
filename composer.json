@@ -2,9 +2,9 @@
     "name": "miituu/api",
     "description": "Plugin for miituu API",
     "require": {
-        "guzzle/guzzle": "stable"
+        "guzzle/guzzle": "dev-hotfix/response-xml-visitor-internals"
     },
-    "license": "Undecided",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "Malcolm Christie",
