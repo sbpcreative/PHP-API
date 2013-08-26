@@ -1,0 +1,20 @@
+{
+    "name": "miituu/api",
+    "description": "Plugin for miituu API",
+    "require": {
+        "guzzle/guzzle": "stable"
+    },
+    "license": "Undecided",
+    "authors": [
+        {
+            "name": "Malcolm Christie",
+            "email": "malcolm@miituu.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-0": {
+            "Miituu": "miituu/"
+        }
+    }
+}
