@@ -1,6 +1,7 @@
 <?php
 
-namespace Miituu;
+use Guzzle\Http\Client;
+namespace miituu;
 
 class Api
 {
@@ -9,3 +10,5 @@ class Api
         die 'Hello!';
     }
 }
+
+$api = new Api();

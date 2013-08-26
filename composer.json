@@ -1,5 +1,6 @@
 {
     "name": "miituu/api",
+    "type": "library",
     "description": "Plugin for miituu API",
     "require": {
         "guzzle/guzzle": "dev-hotfix/response-xml-visitor-internals"
@@ -14,7 +15,7 @@
     "minimum-stability": "dev",
     "autoload": {
         "psr-0": {
-            "Miituu": "miituu/"
+            "miituu": "/"
         }
     }
 }
