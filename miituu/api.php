@@ -3,9 +3,9 @@
 use Guzzle\Http\Client;
 namespace miituu;
 
-class miituu
+class api
 {
-    private $base = 'http://api.miituu.com/';
+    private static $base = 'http://api.miituu.com/';
 
     public function __construct()
     {
