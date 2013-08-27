@@ -19,7 +19,7 @@ class miituu
 
     public function call($endpoint, $data = array(), $method = 'GET', $auth = true)
     {
-        $client = new Client(self::$base);
+        $client = new \Guzzle\Http\Client(self::$base);
 
         $headers = ($auth && self::$token) ? array('headers/X-API-Token' => self::$token) : array();
 
