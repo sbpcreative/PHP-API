@@ -5,7 +5,10 @@ namespace miituu;
 
 class api
 {
-    private static $base = 'http://api.miituu.com/';
+    private static $base  = 'http://api.miituu.dev/';
+    private static $token = false;
+
+    public $success = null;
 
     public function __construct()
     {
@@ -14,7 +17,12 @@ class api
 
     public static function startFromSlug($slug)
     {
+        $token = Token::fromSlug($slug);
+        if ($token->success) {
+            self::$token = $token->token;
+        }
 
+        return $token;
     }
 
     public function call($endpoint, $data = array(), $method = 'GET', $auth = true)
@@ -24,15 +32,19 @@ class api
         $headers = ($auth && self::$token) ? array('headers/X-API-Token' => self::$token) : array();
 
         if ($method == 'GET') {
-            $request = $client->get($endpoint, $headers, array(
-                'query' => $data
-            ));
+            $response = $client->get($endpoint, $headers, array(
+                'query' => $data,
+                'exceptions' => false
+            ))->send();
 
         } else if ($method == 'POST') {
-            $request = $client->get($endpoint, $headers, $data);
-
+            $response = $client->post($endpoint, $headers, $data)->send();
         }
 
-        dd($request);
+        if ($response->getStatusCode() !== 200) {
+            $this->success = false;
+        } else {
+            $this->success = true;
+        }
     }
 }
