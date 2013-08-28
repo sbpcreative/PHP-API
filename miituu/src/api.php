@@ -1,7 +1,8 @@
 <?php
 
-use Guzzle\Http\Client;
 namespace miituu;
+
+use Guzzle\Http\Client;
 
 class api
 {
