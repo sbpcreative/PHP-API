@@ -46,6 +46,19 @@ class Api
     public static function restore($str) {
         self::$auth = json_decode($str);
     }
+}
 
+function el($data, $field, $default = null) {
+    // Array and has field
+    if (is_array($data) && array_key_exists($field, $data)) {
+        return $data[$field];
 
+    // Object and has field
+    } else if (is_object($data) && property_exists($data, $field)) {
+        return $data->$field;
+
+    // Return the default
+    } else {
+        return $default;
+    }
 }
