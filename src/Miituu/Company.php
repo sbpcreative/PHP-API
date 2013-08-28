@@ -6,6 +6,8 @@ class Company extends Model {
 
     protected $path = 'companies/';
 
+    public $fields = array('id', 'name', 'token');
+
     /*
      *  Take a company slug and request a public token
      */

@@ -7,7 +7,7 @@ namespace Miituu;
 class Api
 {
     protected static $base  = 'http://api.miituu.dev/';
-    protected static $auth = false;
+    public static $token = false;
 
     public $success = null;
 
@@ -22,32 +22,35 @@ class Api
     public static function authFromSlug($slug)
     {
         // Public auth is controlled via the company model
-        $company = Company::publicAuth($slug);
+        $token = Token::publicAuth($slug);
 
         // If success, save the auth details
-        if ($company->success) {
-            self::$auth = $company;
+        if ($token->success) {
+            self::$token = $token;
         }
 
         // Return the details
-        return $company;
+        return $token;
     }
 
     /*
      *  Return a JSON string with the auth data for restoring a session later
      */
     public static function authStr() {
-        return json_encode(self::$auth);
+        return json_encode(self::$token->all());
     }
 
     /*
      *  Restore auth detail from a JSON string
      */
     public static function restore($str) {
-        self::$auth = json_decode($str);
+        self::$token = Token::fill(json_decode($str));
     }
 }
 
+/*
+ *  A simple function that returns an item from an object/array, or the optional default value
+ */
 function el($data, $field, $default = null) {
     // Array and has field
     if (is_array($data) && array_key_exists($field, $data)) {
