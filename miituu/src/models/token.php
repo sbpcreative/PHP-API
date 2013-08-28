@@ -1,6 +1,6 @@
 <?php
 
-namespace miituu;
+namespace Miituu;
 
 class Token extends miituu {
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace miituu;
+namespace Miituu;
 
 use Guzzle\Http\Client;
 
-class api
+class Api
 {
     private static $base  = 'http://api.miituu.dev/';
     private static $token = false;
