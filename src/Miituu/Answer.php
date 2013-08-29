@@ -18,4 +18,9 @@ class Answer extends Model {
         )
     );
 
+    public function media() {
+        return null;
+        // return Media::where('answer_id', $this->id);
+    }
+
 }

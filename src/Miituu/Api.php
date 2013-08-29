@@ -6,10 +6,16 @@ namespace Miituu;
 
 class Api
 {
-    protected static $base  = 'http://api.miituu.dev/';
-    public static $token = false;
+    protected static $base      = 'http://api.miituu.dev/';
 
-    public $success = null;
+    // These will be filled with model details when authentication happens
+    public static $token        = false;
+    public static $company      = false;
+    public static $user         = false;
+    public static $permissions  = false;
+
+    //Build an array of each call that's made, for debugging purposes
+    protected static $calls       = array();
 
     public function __construct()
     {
@@ -19,32 +25,61 @@ class Api
     /*
      *  Take a company slug and start a session
      */
-    public static function authFromSlug($slug)
+    public static function publicAuth($slug)
     {
         // Public auth is controlled via the company model
-        $token = Token::publicAuth($slug);
-
-        // If success, save the auth details
-        if ($token->success) {
-            self::$token = $token;
-        }
-
-        // Return the details
-        return $token;
+        return self::$token = Token::publicAuth($slug);
     }
 
     /*
      *  Return a JSON string with the auth data for restoring a session later
      */
     public static function authStr() {
-        return json_encode(self::$token->all());
+        return self::$token->token;
     }
 
     /*
-     *  Restore auth detail from a JSON string
+     *  Restore auth details from a token, optionally accepts a public string which it will re-auth with if necessary
      */
-    public static function restore($str) {
-        self::$token = Token::fill(json_decode($str));
+    public static function restore($token, $slug = false) {
+        self::$token = Token::fill(array('token' => $token));
+        // We can't method chain this check, as self::$token won't exist by the time the call is made
+        self::$token->check();
+
+        // If restore failed and we have a slug, try publicAuth
+        if (!self::$token->success && $slug) {
+            return self::publicAuth($slug);
+        }
+
+        return self::$token;
+    }
+
+    /*
+     *  Login an existing user using email address and password
+     */
+    public static function login($email, $password) {
+        self::$token = Token::login($email, $password);
+
+        return self::$token;
+    }
+
+    /*
+     *  Return a list of all calls made so far by the API, for debugging purposes
+     *  Optionally [slightly] formatted, default
+     */
+    public static function calls( $format = true ) {
+        if (!$format) return self::$calls;
+
+        $html = '<table>';
+        foreach (self::$calls as $call) {
+            foreach ($call as $field => $value) {
+                $html .= "<tr><th>{$field}:</th><td>{$value}</td></tr>";
+            }
+            $html .= '<tr><td colspan="2"><hr></td></tr>';
+        }
+        $html .= '</table>';
+
+        return $html;
     }
 }
 

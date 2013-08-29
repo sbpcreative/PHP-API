@@ -10,12 +10,20 @@ use \Miituu\Rendition as Rendition;
 
 class Model extends Api implements \Iterator {
 
+    // Access this to indicate if the call was successful or not (BOOL)
+    public $success             = null;
+
     // Params to be used for requests
     private $params          = array();
     // The current position for iterating over multiple items
     private $position        = 0;
     // An array to save these multiple items in
     private $items           = array();
+
+    // These are configure in each model
+    public $fields           = array();
+    public $mutable          = array();
+    public $errors           = array();
 
     // All unmodified data for the current item
     private $clean           = array();
@@ -96,6 +104,11 @@ class Model extends Api implements \Iterator {
 
         }
 
+        self::$calls[] = array(
+            'path'          => $url,
+            'status'        => $response->getStatusCode()
+        );
+
         return $this;
     }
 
@@ -148,8 +161,8 @@ class Model extends Api implements \Iterator {
         $this->total_pages   = el($body, 'total_pages');
         $this->per_page      = el($body, 'per_page');
 
-        $this->next_page     = $this->current_page < $this->total_pages ? $this->current_page += 1 : null;
-        $this->prev_page     = $this->current_page > 1 ? $this->current_page -= 1 : null;
+        $this->next_page     = $this->current_page < $this->total_pages ? $this->current_page + 1 : null;
+        $this->prev_page     = $this->current_page > 1 ? $this->current_page - 1 : null;
     }
 
     /*
@@ -175,10 +188,17 @@ class Model extends Api implements \Iterator {
     /*
      *  Set the per_page parameter, specify how many items the API should return
      */
-    public function _take( $int ) {
+    public function _per_page( $int ) {
         $this->per_page = $int;
 
         return $this;
+    }
+
+    /*
+     *  Wraps the _per_page function
+     */
+    public function _take( $int ) {
+        return $this->_per_page($int);
     }
 
     /*
@@ -194,14 +214,14 @@ class Model extends Api implements \Iterator {
 
         // Look for any relations we should create
         foreach ($this->relations as $details) {
-            if ($data = el($data, $details['key'])) {
+            if ($model_data = el($data, $details['key'])) {
                 // This relation exists in this item
 
                 if ($details['multiple']) {
-                    $this->$details['key'] = $details['model']::setItems($data);
+                    $this->$details['key'] = $details['model']::setItems($model_data);
 
                 } else {
-                    $this->$details['key'] = $details['model']::fill($data);
+                    $this->$details['key'] = $details['model']::fill($model_data);
                 }
             }
         }
@@ -225,7 +245,9 @@ class Model extends Api implements \Iterator {
         $this->clean = array();
         $this->dirty = array();
         foreach ($this->relations as $details) {
-            $this->{$details['key']} = array();
+            // If this relation is in existence, unset it
+            if (isset($this->{$details['key']}))
+                unset($this->{$details['key']});
         }
     }
 
@@ -251,10 +273,58 @@ class Model extends Api implements \Iterator {
     }
 
     /*
-     *  Return all fields in an associative array, including dirty items
+     *  Return true if there are multiple items to loop through
      */
-    public function all() {
-        return array_merge($this->clean, $this->dirty);
+    public function multiple() {
+        return count($this->items) > 0;
+    }
+
+    /*
+     *  Return all fields in an associative array, including dirty items
+     *  Optionally, if there are multiple items, return them all as an array
+     *  Optionally, return an object instead, probably use the to_object method though
+     */
+    public function to_array($as_object = false, $all = null) {
+        // Unless all was specific, work it out for ourselves
+        if ($all === null) $all = $this->multiple();
+
+        // Return all items?
+        if ($all) {
+            $result = array();
+            foreach ($this as $item) {
+                // We're getting recursive here, make sure we don't loop over ourself infinitely!
+                $result[] = $item->to_array($as_object, false);
+            }
+            return $result;
+        }
+
+        // Get all the relations for this object
+        $relations = array();
+        foreach ($this->relations as $rel) {
+            if (isset($this->{$rel['key']})) {
+                // Convert the related model to an array too,
+                $relations[ $rel['key'] ] = $this->{$rel['key']}->to_array();
+            }
+        }
+
+        // Put it all together
+        $data = array_merge($this->clean, $this->dirty, $relations);
+
+        // Return it as an abject?
+        if ($as_object) {
+            return (object)$data;
+        } else {
+            return $data;
+        }
+    }
+
+
+    /*
+     *  Wraps the to_array function, but instructs it to return objects
+     *  Getting an object from a function called to_array would be pretty confusing!
+     */
+    public function to_object($all = null) {
+        return $this->to_array(true, $all);
     }
 
     /*
@@ -303,8 +373,8 @@ class Model extends Api implements \Iterator {
         // If there is a clean param for this key, return it
         if (el($this->clean, $key)) return el($this->clean, $key);
 
-        // If not, see if the dynamic call method can handle it
-        return $this->$key();
+        // We got nothing
+        return null;
     }
 
     /*

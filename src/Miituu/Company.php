@@ -6,14 +6,10 @@ class Company extends Model {
 
     protected $path = 'companies/';
 
-    public $fields = array('id', 'name', 'token');
+    public $fields = array('id', 'name', 'status', 'created_at', 'updated_at', 'slug', 'package_id', 'bandwidth_used', 'storage_used', 'over_usage', 'color_scheme', 'use_title', 'users_used', 'billing_status', 'emails_used');
 
-    /*
-     *  Take a company slug and request a public token
-     */
-    public static function publicAuth($slug) {
-        $company = new Company;
-        return $company->call('public_token', array('slug' => $slug));
+    public function collections() {
+        return Collection::where('company_id', $this->id);
     }
 
 }
