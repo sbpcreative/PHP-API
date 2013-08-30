@@ -12,7 +12,7 @@ class Token extends Model {
         array(
             'key' => 'user',
             'model' => '\Miituu\User',
-            'multiple' => true
+            'multiple' => false
         ),
         array(
             'key' => 'company',
@@ -67,7 +67,7 @@ class Token extends Model {
             if ($this->company)        Api::$company       = $this->company;
             if ($this->user)           Api::$user          = $this->user;
             if ($this->permissions)    Api::$permissions   = $this->permissions;
-            if ($this->user && el($token->user, 'permissions'))
+            if ($this->user && el($this->user, 'permissions'))
                                        Api::$permissions   = el($this->user, 'permissions');
         }
 

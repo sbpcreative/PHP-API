@@ -12,9 +12,14 @@ class Answer extends Model {
 
     public $relations = array(
         array(
-            'key' => 'media',
-            'model' => '\Miituu\Media',
-            'multiple' => false
+            'key'       => 'media',
+            'model'     => '\Miituu\Media',
+            'multiple'  => false
+        ),
+        array(
+            'key'       => 'question',
+            'model'     => '\Miituu\Question',
+            'multiple'  => false
         )
     );
 

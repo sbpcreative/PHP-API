@@ -8,6 +8,11 @@ class Api
 {
     protected static $base      = 'http://api.miituu.dev/';
 
+    const LEVEL_PUBLIC          = 4;
+    const LEVEL_ADMIN           = 3;
+    const LEVEL_OWNER           = 2;
+    const LEVEL_MIITUU          = 1;
+
     // These will be filled with model details when authentication happens
     public static $token        = false;
     public static $company      = false;
@@ -34,15 +39,18 @@ class Api
     /*
      *  Return a JSON string with the auth data for restoring a session later
      */
-    public static function authStr() {
+    public static function authStr()
+    {
         return self::$token->token;
     }
 
     /*
      *  Restore auth details from a token, optionally accepts a public string which it will re-auth with if necessary
      */
-    public static function restore($token, $slug = false) {
+    public static function restore($token, $slug = false)
+    {
         self::$token = Token::fill(array('token' => $token));
+
         // We can't method chain this check, as self::$token won't exist by the time the call is made
         self::$token->check();
 
@@ -57,17 +65,52 @@ class Api
     /*
      *  Login an existing user using email address and password
      */
-    public static function login($email, $password) {
+    public static function login($email, $password)
+    {
         self::$token = Token::login($email, $password);
 
         return self::$token;
     }
 
     /*
+     *  If a level is provided, return true if the current auth level is at or higher
+     *  See top for file level constants
+     *  PLEASE NOTE: Lower numbers indicate higher auth level
+     *  If a level is not provided, return the current auth level, or false
+     */
+    public static function level( $level = null )
+    {
+        if ($level) {
+            return (self::$token && self::$token->level_id && self::$token->level_id <= $level);
+
+        } else {
+            return (self::$token && self::$token->level_id) ? self::$token->level_id : false;
+        }
+    }
+
+    /*
+     *  Return true if the current auth allows the provided permission
+     *  See the docs for a list of all possible permissions
+     */
+    public static function can( $permission )
+    {
+        // If no permissions are loaded, the answer is no
+        if (!self::$permissions || !is_array(self::$permissions)) return false;
+
+        foreach (self::$permissions as $perm) {
+            if (el($perm, 'slug') == $permission) return true;
+        }
+
+        return false;
+    }
+
+
+    /*
      *  Return a list of all calls made so far by the API, for debugging purposes
      *  Optionally [slightly] formatted, default
      */
-    public static function calls( $format = true ) {
+    public static function calls( $format = true )
+    {
         if (!$format) return self::$calls;
 
         $html = '<table>';
@@ -86,7 +129,8 @@ class Api
 /*
  *  A simple function that returns an item from an object/array, or the optional default value
  */
-function el($data, $field, $default = null) {
+function el($data, $field, $default = null)
+{
     // Array and has field
     if (is_array($data) && array_key_exists($field, $data)) {
         return $data[$field];

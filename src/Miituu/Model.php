@@ -130,9 +130,17 @@ class Model extends Api implements \Iterator {
     /*
      *  Take a string or array of related models to include
      */
-    public function _with($withs) {
-        // If we got a single item, make sure it's an array
-        if (!is_array($withs)) $withs = array($withs);
+    public function _with() {
+        // Build an array of everything to include
+        $withs = array();
+
+        // Loop through all the arguments
+        $_withs = func_get_args();
+        foreach ($_withs as $w) {
+            // Add everything to the $withs, be it array or string
+            if (is_array($w))  $withs   = array_merge($withs, $w);
+            if (is_string($w)) $withs[] = $w;
+        }
 
         foreach ($withs as $with) {
             $this->params['include_'.$with] = 1;
