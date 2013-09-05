@@ -6,7 +6,7 @@ namespace Miituu;
 
 class Api
 {
-    protected static $base      = 'http://api.miituu.dev/';
+    protected static $base      = 'http://api.miituu.com/';
 
     const LEVEL_PUBLIC          = 4;
     const LEVEL_ADMIN           = 3;
