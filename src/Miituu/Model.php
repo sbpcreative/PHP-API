@@ -161,6 +161,29 @@ class Model extends Api implements \Iterator {
     }
 
     /*
+     *  Take a single value or array to restrict results to
+     */
+    public function _status($statuses) {
+        $this->_where('status', $statuses);
+
+        return $this;
+    }
+
+    /*
+     *  TODO: This is not available for all models, move it to model specific, or add endpoints for all models
+     */
+    public function _publish() {
+        return $this->call('status', array('status' => self::STATUS_PUBLISHED), 'POST');
+    }
+
+    /*
+     *  Send all information for the model to the API to update it
+     */
+    public function _save() {
+        return $this->call('', $this->to_array(), 'POST');
+    }
+
+    /*
      *  Save the current paging information from the API
      */
     public function setPaging($body) {
@@ -293,6 +316,9 @@ class Model extends Api implements \Iterator {
      *  Optionally, return an object instead, probably use the to_object method though
      */
     public function to_array($as_object = false, $all = null) {
+        // Always returning an array for empty objects makes things easier
+        if (!$this->multiple() && !$this->exists()) return array();
+
         // Unless all was specific, work it out for ourselves
         if ($all === null) $all = $this->multiple();
 

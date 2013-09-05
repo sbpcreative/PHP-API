@@ -13,6 +13,8 @@ class Api
     const LEVEL_OWNER           = 2;
     const LEVEL_MIITUU          = 1;
 
+    const STATUS_PUBLISHED      = 1;
+
     // These will be filled with model details when authentication happens
     public static $token        = false;
     public static $company      = false;
@@ -63,6 +65,21 @@ class Api
     }
 
     /*
+     *  Calls the API to check the auth is valid and refresh all user/company/auth data
+     *  This is not usually necessary, as the auth and restore methods all do this
+     */
+    public static function checkAuth() {
+        return Token::check();
+    }
+
+    /*
+     *  Returns true if there are current auth details, but does not validate them with the API
+     */
+    public static function hasAuth() {
+        return self::$token;
+    }
+
+    /*
      *  Login an existing user using email address and password
      */
     public static function login($email, $password)
@@ -70,6 +87,18 @@ class Api
         self::$token = Token::login($email, $password);
 
         return self::$token;
+    }
+
+    /*
+     *  Returns the current company, usually without calling the API
+     */
+    public static function company() {
+        if (self::$company) {
+            return self::$company;
+
+        } else {
+            return Company::get();
+        }
     }
 
     /*
