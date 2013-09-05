@@ -17,10 +17,10 @@ class Model extends Api implements \Iterator {
     private $params          = array();
     // The current position for iterating over multiple items
     private $position        = 0;
-    // An array to save these multiple items in
+    // An array to save multiple items in
     private $items           = array();
 
-    // These are configure in each model
+    // These are configured in each model
     public $fields           = array();
     public $mutable          = array();
     public $errors           = array();
@@ -29,8 +29,6 @@ class Model extends Api implements \Iterator {
     private $clean           = array();
     // All modified data for the current item
     private $dirty           = array();
-    // Only keys in this array are allowed to be changed
-    protected $mutalble      = array();
     // Details of the types of relations the model can have
     protected $relations     = array();
 
@@ -50,7 +48,7 @@ class Model extends Api implements \Iterator {
         // Initialize Guzzle
         $client = new \Guzzle\Http\Client(self::$base, array(
             'request.options' => array(
-                'proxy'   => 'http:://192.168.1.96:8888'
+                // 'proxy'   => 'http:://192.168.1.96:8888'
             )
         ));
 
