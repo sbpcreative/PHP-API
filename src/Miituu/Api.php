@@ -6,7 +6,7 @@ namespace Miituu;
 
 class Api
 {
-    protected static $base      = 'http://stage.api.miituu.com/';
+    protected static $base      = 'http://api.miituu.dev/';
 
     const LEVEL_PUBLIC          = 4;
     const LEVEL_ADMIN           = 3;
@@ -20,6 +20,7 @@ class Api
     public static $company      = false;
     public static $user         = false;
     public static $permissions  = false;
+    public static $boltons      = false;
 
     //Build an array of each call that's made, for debugging purposes
     protected static $calls       = array();
@@ -49,12 +50,12 @@ class Api
     /*
      *  Restore auth details from a token, optionally accepts a public string which it will re-auth with if necessary
      */
-    public static function restore($token, $slug = false)
+    public static function restore($token, $slug = false, $include = false)
     {
         self::$token = Token::fill(array('token' => $token));
 
         // We can't method chain this check, as self::$token won't exist by the time the call is made
-        self::$token->check();
+        self::$token->check($include);
 
         // If restore failed and we have a slug, try publicAuth
         if (!self::$token->success && $slug) {
@@ -68,8 +69,8 @@ class Api
      *  Calls the API to check the auth is valid and refresh all user/company/auth data
      *  This is not usually necessary, as the auth and restore methods all do this
      */
-    public static function checkAuth() {
-        return Token::check();
+    public static function checkAuth($include = false) {
+        return Token::check($include);
     }
 
     /*
