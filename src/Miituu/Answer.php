@@ -20,6 +20,11 @@ class Answer extends Model {
             'key'       => 'question',
             'model'     => '\Miituu\Question',
             'multiple'  => false
+        ),
+        array(
+            'key'       => 'respondent',
+            'model'     => '\Miituu\Respondent',
+            'multiple'  => false
         )
     );
 
