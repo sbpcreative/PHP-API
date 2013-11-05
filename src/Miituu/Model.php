@@ -48,7 +48,7 @@ class Model extends Api implements \Iterator {
         // Initialize Guzzle
         $client = new \Guzzle\Http\Client(self::$base, array(
             'request.options' => array(
-                'proxy'   => 'http:://192.168.1.96:8888'
+                // 'proxy'   => 'http:://192.168.1.96:8888'
             )
         ));
 
