@@ -18,7 +18,7 @@ class Respondent extends Model {
         ),
         array(
             'key'       => 'userfieldanswers',
-            'model'     => '\Miituu\UserfieldAnswer',
+            'model'     => '\Miituu\Userfieldanswer',
             'multiple'  => true
         )
     );

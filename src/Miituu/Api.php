@@ -7,6 +7,7 @@ namespace Miituu;
 class Api
 {
     protected static $base      = 'https://stage-api.miituu.com/';
+    // protected static $base      = 'http://api.miituu.dev/';
 
     const LEVEL_PUBLIC          = 4;
     const LEVEL_ADMIN           = 3;
