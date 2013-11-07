@@ -27,7 +27,7 @@ class Api
     // You should [probably] never need to adjust the environment
     protected static $base_urls   = array(
         'live'  => 'https://api.miituu.com/',
-        'stage' => 'http://stage-api.miituu.dev/',
+        'stage' => 'http://stage-api.miituu.com/',
         'dev'   => 'http://api.miituu.dev/'
     );
 
