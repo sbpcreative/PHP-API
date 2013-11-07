@@ -6,29 +6,60 @@ namespace Miituu;
 
 class Api
 {
-    protected static $base      = 'https://stage-api.miituu.com/';
-    // protected static $base      = 'http://api.miituu.dev/';
+    const LEVEL_PUBLIC            = 4;
+    const LEVEL_ADMIN             = 3;
+    const LEVEL_OWNER             = 2;
+    const LEVEL_MIITUU            = 1;
 
-    const LEVEL_PUBLIC          = 4;
-    const LEVEL_ADMIN           = 3;
-    const LEVEL_OWNER           = 2;
-    const LEVEL_MIITUU          = 1;
-
-    const STATUS_PUBLISHED      = 1;
+    const STATUS_PUBLISHED        = 1;
 
     // These will be filled with model details when authentication happens
-    public static $token        = false;
-    public static $company      = false;
-    public static $user         = false;
-    public static $permissions  = false;
-    public static $boltons      = false;
+    public static $token          = false;
+    public static $company        = false;
+    public static $user           = false;
+    public static $permissions    = false;
+    public static $boltons        = false;
 
-    //Build an array of each call that's made, for debugging purposes
+    // Build an array of each call that's made, for debugging purposes
     protected static $calls       = array();
 
-    public function __construct()
-    {
+    // These URLs are used for different environments, e.g. development and test
+    // You should [probably] never need to adjust the environment
+    protected static $base_urls   = array(
+        'live'  => 'https://api.miituu.com/',
+        'stage' => 'http://stage-api.miituu.dev/',
+        'dev'   => 'http://api.miituu.dev/'
+    );
 
+    protected static $base        = 'https://api.miituu.com/';
+    protected static $environment = 'live';
+
+    protected static $proxy       = null;
+
+    /*
+     *  This allows us to change the API environment, e.g. developer and test
+     *  You should [probably] never need to use this
+     */
+    public static function setEnvironment($environment)
+    {
+        // If a base URL doesn't exist for it, it's not an acceptable environment
+        if (!array_key_exists($environment, self::$base_urls)) {
+            throw new Exception("Unknown miituu API environment '{$environment}'");
+        }
+
+        // Make the change
+        self::$environment = $environment;
+        self::$base = self::$base_urls[$environment];
+    }
+
+    /*
+     *  Pass in proxy details if requests should be routed via a proxy, e.g.
+     *  tcp://localhost:80
+     *  http://username:password@192.168.16.1:10
+     */
+    public static function setProxy($proxy)
+    {
+        self::$proxy = $proxy;
     }
 
     /*
@@ -49,7 +80,9 @@ class Api
     }
 
     /*
-     *  Restore auth details from a token, optionally accepts a public string which it will re-auth with if necessary
+     *  Restore auth details from a token
+     *  Optionally accepts a public slug which it will re-auth with if necessary
+     *  Optionally also an array of objects related to the user to request too
      */
     public static function restore($token, $slug = false, $include = false)
     {
@@ -166,7 +199,7 @@ function el($data, $field, $default = null)
     if (is_array($data) && array_key_exists($field, $data)) {
         return $data[$field];
 
-    // Object and has field
+    // Object and has property
     } else if (is_object($data) && property_exists($data, $field)) {
         return $data->$field;
 
