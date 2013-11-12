@@ -10,6 +10,8 @@ class Answer extends Model {
 
     public $mutable = array('text', 'multichoice', 'status', 'rating', 'featured', 'description');
 
+    public $has_status = true;
+
     public $relations = array(
         array(
             'key'       => 'media',
@@ -25,6 +27,11 @@ class Answer extends Model {
             'key'       => 'respondent',
             'model'     => '\Miituu\Respondent',
             'multiple'  => false
+        ),
+        array(
+            'key'       => 'transcripts',
+            'model'     => '\Miituu\Transcript',
+            'multiple'  => true
         )
     );
 

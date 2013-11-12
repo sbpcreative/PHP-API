@@ -24,6 +24,8 @@ class Model extends Api implements \Iterator {
     public $fields           = array();
     public $mutable          = array();
     public $errors           = array();
+    // Indicates whether the model/status endpoint is applicable
+    public $has_status       = false;
 
     // All unmodified data for the current item
     private $clean           = array();
@@ -126,6 +128,20 @@ class Model extends Api implements \Iterator {
     }
 
     /*
+     *  Change the status of the object using the /model/status endpoint
+     *  This triggers any cascading changes in related models
+     */
+    public function _set_status($status) {
+        if (!$this->has_status) throw new \Exception(get_class($this).' does not use the /model/status endpoint');
+
+        return $this->call('status', array('id' => $this->id, 'status' => $status), 'POST');
+    }
+
+    public function _publish() {
+        return $this->set_status(self::STATUS_PUBLISHED);
+    }
+
+    /*
      *  Take a string or array of related models to include
      */
     public function _with() {
@@ -165,13 +181,6 @@ class Model extends Api implements \Iterator {
         $this->_where('status', $statuses);
 
         return $this;
-    }
-
-    /*
-     *  TODO: This is not available for all models, move it to model specific, or add endpoints for all models
-     */
-    public function _publish() {
-        return $this->call('status', array('status' => self::STATUS_PUBLISHED), 'POST');
     }
 
     /*

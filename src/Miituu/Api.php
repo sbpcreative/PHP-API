@@ -12,6 +12,8 @@ class Api
     const LEVEL_MIITUU            = 1;
 
     const STATUS_PUBLISHED        = 1;
+    const STATUS_UNPUBLISHED      = 0;
+    const STATUS_PRIVATE          = 0;
 
     // These will be filled with model details when authentication happens
     public static $token          = false;
