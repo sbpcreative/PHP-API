@@ -24,8 +24,9 @@ class Token extends Model {
     /*
      *  Take a company slug and request a public token
      */
-    public static function publicAuth($slug) {
-        $token = Token::with(array('company', 'permissions'))->call('public', array('slug' => $slug));
+    public static function publicAuth($slug, $include = false) {
+        $include = $include ?: array('company', 'permissions');
+        $token = Token::with($include)->call('public', array('slug' => $slug));
 
         // If we we're successful, copy these details to the Api::static for easy access
         if ($token->success) {

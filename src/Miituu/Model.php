@@ -277,6 +277,14 @@ class Model extends Api implements \Iterator {
     }
 
     /*
+     *  If this is a list of multiple items, return the first one
+     */
+    public function _first() {
+        $this->fill( $this->items[0] );
+        return $this;
+    }
+
+    /*
      *  Reset all parameters to empty
      */
     public function reset() {

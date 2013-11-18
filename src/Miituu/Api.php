@@ -6,6 +6,8 @@ namespace Miituu;
 
 class Api
 {
+    // Yes, these would be more convenient the other way round
+    // Always compare them using the Api::level() function
     const LEVEL_PUBLIC            = 4;
     const LEVEL_ADMIN             = 3;
     const LEVEL_OWNER             = 2;
@@ -74,10 +76,12 @@ class Api
     }
 
     /*
-     *  Return a JSON string with the auth data for restoring a session later
+     *  Return a string with the auth data for restoring a session later
      */
     public static function authStr()
     {
+        if (!self::hasAuth()) return false;
+
         return self::$token->token;
     }
 
@@ -113,7 +117,7 @@ class Api
      *  Returns true if there are current auth details, but does not validate them with the API
      */
     public static function hasAuth() {
-        return self::$token;
+        return (BOOL)self::$token;
     }
 
     /*
@@ -129,7 +133,7 @@ class Api
     /*
      *  Returns the current company, usually without calling the API
      */
-    public static function company() {
+    public static function currentCompany() {
         if (self::$company) {
             return self::$company;
 
@@ -139,14 +143,30 @@ class Api
     }
 
     /*
+     *  Returns the current user, usually without calling the API
+     */
+    public static function currentUser() {
+        if (self::$user) {
+            return self::$user;
+
+        } else {
+            return User::get();
+        }
+    }
+
+    /*
      *  If a level is provided, return true if the current auth level is at or higher
+     *  If $exact_match is true, only return true if the level matches (not higher)
      *  See top for file level constants
      *  PLEASE NOTE: Lower numbers indicate higher auth level
      *  If a level is not provided, return the current auth level, or false
      */
-    public static function level( $level = null )
+    public static function level( $level = null, $exact_match = false )
     {
-        if ($level) {
+        if ($level && $exact_match) {
+            return (self::$token && self::$token->level_id && self::$token->level_id == $level);
+
+        } else if ($level) {
             return (self::$token && self::$token->level_id && self::$token->level_id <= $level);
 
         } else {
